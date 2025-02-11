@@ -135,31 +135,82 @@ multi-object-detection-tracking/
 ```
 
 ---
+---
 
-## Contributing
+### **I. SSD MobileNet V3**
+- **SSD (Single Shot MultiBox Detector)**:
+  - A single-stage object detection model that directly predicts bounding boxes and class labels in a single forward pass.
+  - Unlike two-stage models like Faster R-CNN, SSD does not need a separate region proposal step, making it much faster.
 
-We welcome contributions to this project. Feel free to submit pull requests or open issues if you encounter bugs or want to suggest new features.
+- **MobileNet V3 Backbone**:
+  - A lightweight CNN designed for mobile and edge devices.
+  - Uses depthwise separable convolutions for efficiency.
+  - Incorporates **Squeeze-and-Excitation (SE) blocks** to enhance feature extraction.
 
-To contribute:
-1. Fork the repository.
-2. Create a new branch for your feature (`git checkout -b feature-name`).
-3. Commit your changes (`git commit -am 'Add new feature'`).
-4. Push to the branch (`git push origin feature-name`).
-5. Open a pull request.
-
+- **How It Works**:
+  - Image is passed through **MobileNet V3** for feature extraction.
+  - SSD applies multiple convolutional layers to detect objects at different scales.
+  - Predictions are made directly on feature maps using **default anchor boxes**.
 
 ---
 
-## Acknowledgements
+### **II. SSD MobileNet V3 vs Faster R-CNN or YOLO**
+- **Compared to Faster R-CNN**:
+  - SSD is **faster** but **less accurate**.
+  - Faster R-CNN is two-stage (slower but more precise).
+  - SSD is better for real-time applications where speed is important.
 
-- OpenCV for computer vision tasks
-- TensorFlow for object detection model inference
-- The Kalman Filter for object tracking
-- The COCO dataset for pre-trained model
+- **Compared to YOLO**:
+  - **YOLO (You Only Look Once)** is faster than SSD but may struggle with small objects.
+  - **SSD is more balanced** in terms of speed and accuracy.
+  - **MobileNet V3 makes SSD more lightweight** than YOLO, especially for mobile and embedded devices.
 
 ---
 
-## Conclusion
+### **III. Key files needed to run inference**
+| File Type | Purpose |
+|-----------|---------|
+| **Frozen Model (.pb or SavedModel format)** | Stores trained model weights. |
+| **Configuration File (.pbtxt)** | Defines model structure and parameters. |
+| **Label Map (.pbtxt or .txt)** | Maps class IDs to object names (e.g., COCO labels). |
 
-This project is a demonstration of combining object detection and tracking using deep learning and traditional algorithms like the Kalman Filter. It's designed to be modular and easy to adapt to different types of objects or video streams. With further improvements, it could be extended to real-time applications such as video surveillance or autonomous vehicles.
+---
 
+### **IV. How to fine-tune the model on a custom dataset**
+1. **Prepare the Dataset**:
+   - Collect images and annotate objects in **Pascal VOC or TFRecord format**.
+   - Create a **label map** for new object classes.
+
+2. **Modify Pipeline Configuration File**:
+   - Update the dataset path.
+   - Adjust **batch size, learning rate, and training steps**.
+   - Set the number of object classes.
+
+3. **Train the Model**:
+   - Use TensorFlow Object Detection API.
+   - Fine-tune using a **pre-trained COCO model**.
+
+4. **Export the Trained Model**:
+   - Convert to **SavedModel format** for inference.
+
+---
+
+### **V. Potential optimizations that can be applied for real-time inference**
+1. **Quantization**: Convert model weights to lower precision (e.g., **INT8** or **FLOAT16**) for faster execution.
+2. **TensorFlow Lite (TFLite)**: Convert model to **TFLite** for deployment on mobile and embedded devices.
+3. **TensorRT Optimization**: Use NVIDIA **TensorRT** for GPU acceleration.
+4. **Batch Inference**: Process multiple images in one pass.
+5. **Reduce Input Size**: Lower resolution images for faster inference with minimal accuracy loss.
+
+---
+
+### **VI. COCO dataset**
+- **COCO Dataset Features**:
+  - 80 object classes.
+  - Large-scale, diverse dataset covering real-world scenes.
+  - Annotated with bounding boxes, segmentation masks, and keypoints.
+
+- **Impact on Model**:
+  - Pre-trained models on COCO **generalize well** to various detection tasks.
+  - May **struggle with domain-specific objects** if fine-tuning isn’t done.
+  - Provides a **strong baseline** for transfer learning.
